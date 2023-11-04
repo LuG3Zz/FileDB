@@ -1,4 +1,4 @@
-# calclex.py
+# SqlParser.py
 
 from sly import Lexer, Parser
 
@@ -7,7 +7,7 @@ class SqlLexer(Lexer):
     # Set of token names.   This is always required
     tokens = {ID, NUMBER, STRING, SELECT, FROM, WHERE, AND, OR}
 
-    literals = {"(", ")", ";", "*", "+", "-", "=", "<", ">"}
+    literals = {"(", ")", ";", "*", "+", "-", "=", "<", ">", ","}
 
     # String containing ignored characters
     ignore = " \t"
@@ -51,7 +51,7 @@ class SqlParser(Parser):
 
     @_("SELECT select_list FROM table_list where_clause")
     def select_statement(self, p):
-        return ("select", p.select_list, p.table_list, p.where_clause)
+        return ("select", p.select_list, "from", p.table_list, p.where_clause)
 
     @_("select_item")
     def select_list(self, p):
@@ -132,13 +132,17 @@ class SqlParser(Parser):
         else:
             print("Syntax error at EOF")
 
+    # 画出对应的语法树
+    def draw(self, result):
+        print()
+
 
 if __name__ == "__main__":
     lexer = SqlLexer()
     parser = SqlParser()
 
     # sql = "select * from t1 "
-    sql = "select * from student where name = 'Alice' and age > 18"
+    sql = "select age,no from student,teacher where name = 'Alice' and age > 18"
 
     result = parser.parse(lexer.tokenize(sql))
     print(result)
